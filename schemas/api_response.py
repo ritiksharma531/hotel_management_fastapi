@@ -8,3 +8,7 @@ class APIResponse(BaseModel):
     message: str
     data: Any = None
     errors: Any = None
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str

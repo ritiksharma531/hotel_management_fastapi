@@ -4,7 +4,7 @@ from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm
 from dependencies import get_auth_service
 from logs.logger import logger
-from schemas.api_response import APIResponse
+from schemas.api_response import APIResponse, TokenResponse
 from schemas.user import RegisterUserRequest, UserResponse
 from services.auth_service import AuthService
 
@@ -24,7 +24,7 @@ async def register_user(new_user: RegisterUserRequest, auth_service: AuthService
     )
 
 
-@router.post('/login', status_code=status.HTTP_200_OK, response_model=APIResponse)
+@router.post('/login', status_code=status.HTTP_200_OK, response_model=TokenResponse)
 async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], auth_service: AuthService = Depends(get_auth_service)):
     logger.info('Login endpoint hit')
     return await auth_service.login_user(form_data)

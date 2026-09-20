@@ -11,7 +11,7 @@ class TestAuthRepository:
 
     @pytest.mark.asyncio
     async def test_check_admin(self):
-        admin = User(uid=1, fullname="Ritik Kumar", email="ritik@gmail.com", hashed_password="hashed", role="admin")
+        admin = User(uid=1, fullname="Ritik Sharma", email="ritik@gmail.com", hashed_password="hashed", role="admin")
         result = Mock()
         result.scalar_one_or_none.return_value = admin
         self.db.execute.return_value = result
@@ -23,7 +23,7 @@ class TestAuthRepository:
 
     @pytest.mark.asyncio
     async def test_is_user_exists_true(self):
-        user = User(uid=1, fullname="Ritik Kumar", email="ritik@gmail.com", hashed_password="hashed", role="user")
+        user = User(uid=1, fullname="Ritik Sharma", email="ritik@gmail.com", hashed_password="hashed", role="user")
         result = Mock()
         result.scalar_one_or_none.return_value = user
         self.db.execute.return_value = result
@@ -46,7 +46,7 @@ class TestAuthRepository:
 
     @pytest.mark.asyncio
     async def test_authenticate_user(self):
-        user = User(uid=1, fullname="Ritik Kumar", email="ritik@gmail.com", hashed_password="hashed", role="user")
+        user = User(uid=1, fullname="Ritik Sharma", email="ritik@gmail.com", hashed_password="hashed", role="user")
         result = Mock()
         result.scalar_one_or_none.return_value = user
         self.db.execute.return_value = result
@@ -58,7 +58,7 @@ class TestAuthRepository:
 
     @pytest.mark.asyncio
     async def test_register(self):
-        user = User(fullname="Ritik Kumar", email="ritik@gmail.com", hashed_password="hashed", role="user")
+        user = User(fullname="Ritik Sharma", email="ritik@gmail.com", hashed_password="hashed", role="user")
 
         response = await self.repo.register(user)
 

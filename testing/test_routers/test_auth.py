@@ -15,12 +15,12 @@ class TestAuthRouter:
         self.app.dependency_overrides[get_auth_service] = lambda: self.auth_service
 
     def test_register_user(self):
-        result = User(uid=1, fullname='Ritik Kumar', email='ritik@gmail.com', hashed_password='hashed', role='user')
+        result = User(uid=1, fullname='Ritik Sharma', email='ritik@gmail.com', hashed_password='hashed', role='user')
         self.auth_service.register_user.return_value = result
 
         response = self.client.post(
             '/auth/register',
-            json={"fullname": "Ritik Kumar", "email": "ritik@gmail.com", "password": "djs27GH@#", "role": "user"}
+            json={"fullname": "Ritik Sharma", "email": "ritik@gmail.com", "password": "djs27GH@#", "role": "user"}
         )
 
         data = response.json().get('data')
@@ -35,7 +35,7 @@ class TestAuthRouter:
 
         response = self.client.post(
             '/auth/login',
-            data={"username": "ritik@gmail.com", "password": "Passw0rd!"}
+            data={"username": "ritik@gmail.com", "password": "wfG646fv#$@"}
         )
 
         assert response.status_code == 200
