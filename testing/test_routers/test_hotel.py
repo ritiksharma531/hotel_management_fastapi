@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from dependencies import get_current_user, get_hotel_service
 from models.hotel import Hotel
+from models.room import Room
 from routers import hotel
 
 
@@ -49,3 +50,23 @@ class TestHotelRouter:
         assert len(data) == 2
         assert data[0].get('hname') == 'Taj Palace'
         assert data[1].get('rating') == 4
+
+    def test_get_available_rooms(self):
+        result = [
+            Room(room_id=1, room_type='regular', price=1500, hid=1),
+            Room(room_id=2, room_type='premium', price=3000, hid=1)
+        ]
+        self.hotel_service.get_available_rooms.return_value = result
+
+        response = self.client.get(
+            '/hotels/1/rooms',
+            params={"check_in_date": "2026-09-18", "check_out_date": "2026-09-19"}
+        )
+
+        data = response.json().get('data')
+        assert response.status_code == 200
+        assert response.json().get('success') == True
+        assert response.json().get('message') == 'Room availability fetched successfully'
+        assert len(data) == 2
+        assert data[0].get('room_id') == 1
+        assert data[1].get('room_type') == 'premium'

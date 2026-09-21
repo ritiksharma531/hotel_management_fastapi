@@ -28,7 +28,7 @@ class RoomRepository:
                     .where(Booking.check_in_date < room.check_out_date)
                     .where(Booking.check_out_date > room.check_in_date)
                 )
-            )
+            ).with_for_update()
         )
         result = await self.db.execute(query)
         return result.scalar()

@@ -36,22 +36,9 @@ async def update_booking_status(booking_id: int, status: BookingStatus, user: di
 
 
 @router.get('', status_code=status.HTTP_200_OK, response_model=APIResponse)
-async def get_all_bookings(user: dict = Depends(get_current_user), booking_service: BookingService = Depends(get_booking_service)):
-    logger.info(f'get all bookings endpoint hit by {user.get('uid')}')
-    result =  await booking_service.get_all_bookings(user)
-    data = []
-    for booking in result:
-        data.append(BookingResponse.model_validate(booking).model_dump())
-    return APIResponse(
-        success=True,
-        message='Bookings fetched successfully',
-        data=data
-    )
-
-@router.get('/my_bookings', status_code=status.HTTP_200_OK, response_model=APIResponse)
-async def get_my_bookings(user: dict = Depends(get_current_user), booking_service: BookingService = Depends(get_booking_service)):
-    logger.info(f'get my bookings endpoint hit by {user.get('uid')}')
-    result = await booking_service.get_my_bookings(user)
+async def get_bookings(user: dict = Depends(get_current_user), booking_service: BookingService = Depends(get_booking_service)):
+    logger.info(f'get bookings endpoint hit by {user.get('uid')}')
+    result =  await booking_service.get_bookings(user)
     data = []
     for booking in result:
         data.append(BookingResponse.model_validate(booking).model_dump())

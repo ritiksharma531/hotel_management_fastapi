@@ -1,11 +1,9 @@
-from datetime import date
 from unittest.mock import AsyncMock
 
 import pytest
 
 from exceptions.exceptions import ForbiddenException, UnauthenticatedException, NotFoundException
 from models import Room
-from schemas.hotel import GetAvailabilityRequest
 from schemas.room import AddRoomRequest
 from services.room_service import RoomService
 
@@ -27,23 +25,6 @@ class TestRoom:
         assert response is True
 
     @pytest.mark.asyncio
-    async def test_get_available_rooms(self):
-        availability_request = GetAvailabilityRequest(
-            hid=1, check_in_date=date(2026, 11, 18), check_out_date=date(2026, 11, 19)
-        )
-        result = [
-            Room(room_id=1, room_type='regular', price=1000, hid=1)
-        ]
-        self.hotel_repository.is_hotel_available.return_value = True
-        self.hotel_repository.get_available_rooms.return_value = result
-
-        response = await self.room_service.get_available_rooms(availability_request, self.user)
-
-        assert response[0].room_id == 1
-        assert response[0].room_type == 'regular'
-        assert response[0].price == 1000
-
-    @pytest.mark.asyncio
     async def test_add_room(self):
         new_room = AddRoomRequest(room_type='regular', price=1000, hid=1)
         result = Room(room_id=1, room_type='regular', price=1000, hid=1)
@@ -55,24 +36,6 @@ class TestRoom:
         assert response.room_id == 1
         assert response.room_type == 'regular'
         assert response.hid == 1
-
-    @pytest.mark.asyncio
-    async def test_get_available_rooms_unauthenticated(self):
-        availability_request = GetAvailabilityRequest(
-            hid=1, check_in_date=date(2026, 11, 18), check_out_date=date(2026, 11, 19)
-        )
-        with pytest.raises(UnauthenticatedException):
-            await self.room_service.get_available_rooms(availability_request, None)
-
-    @pytest.mark.asyncio
-    async def test_get_available_rooms_hotel_not_found(self):
-        availability_request = GetAvailabilityRequest(
-            hid=1, check_in_date=date(2026, 11, 18), check_out_date=date(2026, 11, 19)
-        )
-        self.hotel_repository.is_hotel_available.return_value = False
-
-        with pytest.raises(NotFoundException):
-            await self.room_service.get_available_rooms(availability_request, self.user)
 
     @pytest.mark.asyncio
     async def test_add_room_unauthenticated(self):

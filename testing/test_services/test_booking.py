@@ -19,19 +19,6 @@ class TestBooking:
         self.booking_service = BookingService(self.booking_repository, self.hotel_repository, self.room_repository)
 
     @pytest.mark.asyncio
-    async def test_get_all_bookings(self):
-        result = [
-            Booking(bid=1, uid=2, room_id=2, booking_date=date(2026, 11, 17), check_in_date=date(2026, 11, 18),
-                    check_out_date=date(2026, 11, 19), status='booked')
-        ]
-        self.booking_repository.get_all_bookings.return_value = result
-        response = await self.booking_service.get_all_bookings(self.admin)
-
-        assert response[0].bid == 1
-        assert response[0].uid == 2
-        assert response[0].room_id == 2
-
-    @pytest.mark.asyncio
     async def test_book_room(self):
         booking_request = BookRoomRequest(
             room_id=1, check_in_date=date(2026, 11, 18), check_out_date=date(2026, 11, 19)
@@ -48,27 +35,9 @@ class TestBooking:
 
 
     @pytest.mark.asyncio
-    async def test_get_my_bookings(self):
-        result = [
-            Booking(bid=1, uid=2, room_id=2, booking_date=date(2026, 9, 17), check_in_date=date(2026, 9, 18),
-                    check_out_date=date(2026, 9, 19), status='booked')
-        ]
-        self.booking_repository.get_my_bookings.return_value = result
-        response = await self.booking_service.get_my_bookings(self.user)
-
-        assert response[0].bid == 1
-        assert response[0].uid == 2
-        assert response[0].room_id == 2
-
-    @pytest.mark.asyncio
-    async def test_get_all_bookings_unauthenticated(self):
+    async def test_get_bookings_unauthenticated(self):
         with pytest.raises(UnauthenticatedException):
-            await self.booking_service.get_all_bookings(None)
-
-    @pytest.mark.asyncio
-    async def test_get_all_bookings_forbidden_for_user(self):
-        with pytest.raises(ForbiddenException):
-            await self.booking_service.get_all_bookings(self.user)
+            await self.booking_service.get_bookings(None)
 
 
     @pytest.mark.asyncio
@@ -144,14 +113,32 @@ class TestBooking:
 
 
     @pytest.mark.asyncio
-    async def test_get_my_bookings_unauthenticated(self):
-        with pytest.raises(UnauthenticatedException):
-            await self.booking_service.get_my_bookings(None)
+    async def test_get_bookings_admin_uses_get_all_bookings(self):
+        result = [
+            Booking(bid=1, uid=2, room_id=2, booking_date=date(2026, 9, 17), check_in_date=date(2026, 9, 18),
+                    check_out_date=date(2026, 9, 19), status='booked')
+        ]
+        self.booking_repository.get_all_bookings.return_value = result
+
+        response = await self.booking_service.get_bookings(self.admin)
+
+        self.booking_repository.get_all_bookings.assert_awaited_once()
+        self.booking_repository.get_my_bookings.assert_not_called()
+        assert response == result
 
     @pytest.mark.asyncio
-    async def test_get_my_bookings_forbidden_for_admin(self):
-        with pytest.raises(ForbiddenException):
-            await self.booking_service.get_my_bookings(self.admin)
+    async def test_get_bookings_user_uses_get_my_bookings(self):
+        result = [
+            Booking(bid=1, uid=1, room_id=2, booking_date=date(2026, 9, 17), check_in_date=date(2026, 9, 18),
+                    check_out_date=date(2026, 9, 19), status='booked')
+        ]
+        self.booking_repository.get_my_bookings.return_value = result
+
+        response = await self.booking_service.get_bookings(self.user)
+
+        self.booking_repository.get_my_bookings.assert_awaited_once_with(self.user.get('uid'))
+        self.booking_repository.get_all_bookings.assert_not_called()
+        assert response == result
 
 
     def test_get_updated_price_regular_day(self):

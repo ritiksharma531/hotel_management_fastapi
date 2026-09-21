@@ -26,7 +26,7 @@ class TestBookingRepository:
         result.scalar_one_or_none.return_value = booking
         self.db.execute.return_value = result
 
-        response = await self.repo.get_booking(1)
+        response = await self.repo.get_booking(1, 1)
 
         assert response == booking
         self.db.execute.assert_awaited_once()

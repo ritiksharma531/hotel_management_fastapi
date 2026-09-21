@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
-
-from dependencies import get_hotel_service, get_current_user
+from dependencies import get_hotel_service, get_current_user, get_room_service
 from logs.logger import logger
 from schemas.api_response import APIResponse
-from schemas.hotel import AddHotelRequest, HotelResponse
+from schemas.hotel import AddHotelRequest, HotelResponse, GetAvailabilityRequest
+from schemas.room import RoomResponse
 from services.hotel_service import HotelService
 
 router = APIRouter(
@@ -32,5 +32,18 @@ async def view_all_hotels(user: dict = Depends(get_current_user), hotel_service:
     return APIResponse(
         success=True,
         message='Hotels fetched successfully',
+        data=data
+    )
+
+@router.get('/{hid}/rooms', status_code=status.HTTP_200_OK, response_model=APIResponse)
+async def get_available_rooms(hid: int, get_availability_request: GetAvailabilityRequest = Query(), hotel_service: HotelService = Depends(get_hotel_service), user: dict = Depends(get_current_user)):
+    logger.info(f'get available rooms endpoint hit by {user.get('uid')}')
+    result = await hotel_service.get_available_rooms(hid, get_availability_request, user)
+    data = []
+    for room in result:
+        data.append(RoomResponse.model_validate(room).model_dump())
+    return APIResponse(
+        success=True,
+        message='Room availability fetched successfully',
         data=data
     )

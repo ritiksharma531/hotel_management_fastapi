@@ -9,7 +9,6 @@ class AddHotelRequest(BaseModel):
 
 
 class GetAvailabilityRequest(BaseModel):
-    hid: int
     check_in_date: date = date.today()
     check_out_date: date = date.today()
 

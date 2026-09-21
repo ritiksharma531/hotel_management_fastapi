@@ -5,7 +5,7 @@ from datetime import date
 class AddRoomRequest(BaseModel):
     room_type: str
     price: int = Field(gt=0, lt=50000)
-    hid: int = Field(gt=-1)
+    hid: int = Field(gt=0)
 
     @field_validator('room_type')
     @classmethod

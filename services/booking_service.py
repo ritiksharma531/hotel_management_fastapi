@@ -63,7 +63,7 @@ class BookingService:
         if user.get('role') != 'user':
             raise ForbiddenException('Admin not allowed')
 
-        booking = await self.booking_repository.get_booking(bid)
+        booking = await self.booking_repository.get_booking(bid, user.get('uid'))
         if booking is None:
             raise NotFoundException('Booking not found')
 
@@ -81,24 +81,15 @@ class BookingService:
         return result
 
 
-    async def get_all_bookings(self, user: dict):
+    async def get_bookings(self, user: dict):
         if user is None:
             raise UnauthenticatedException('Register or Login first')
 
-        if user.get('role') != 'admin':
-            raise ForbiddenException('Only admin allowed')
+        if user.get('role') == 'admin':
+            result = await self.booking_repository.get_all_bookings()
 
-        result = await self.booking_repository.get_all_bookings()
+        else:
+            result = await self.booking_repository.get_my_bookings(user.get('uid'))
+
         logger.info(f'User with id {user.get('uid')} viewed all bookings')
-        return result
-
-    async def get_my_bookings(self, user: dict):
-        if user is None:
-            raise UnauthenticatedException('Register or Login first')
-
-        if user.get('role') != 'user':
-            raise ForbiddenException('Admin not allowed')
-
-        result = await self.booking_repository.get_my_bookings(user.get('uid'))
-        logger.info(f'User with id {user.get('uid')} viewed his/her bookings')
         return result

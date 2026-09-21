@@ -12,8 +12,8 @@ class BookingRepository:
         await self.db.commit()
         return booking_model
 
-    async def get_booking(self, bid: int):
-        result = await self.db.execute(select(Booking).where(Booking.bid == bid))
+    async def get_booking(self, bid: int, uid: int):
+        result = await self.db.execute(select(Booking).where(Booking.bid == bid).where(Booking.uid == uid))
         return result.scalar_one_or_none()
 
     async def get_all_bookings(self):
