@@ -43,11 +43,6 @@ class TestHotel:
         assert response[1].hid == 2
         assert response[1].hname == 'Oberoi'
 
-    @pytest.mark.asyncio
-    async def test_add_hotel_unauthenticated(self):
-        add_hotel_request = AddHotelRequest(hname='Taj', rating=5)
-        with pytest.raises(UnauthenticatedException):
-            await self.hotel_service.add_hotel(None, add_hotel_request)
 
     @pytest.mark.asyncio
     async def test_add_hotel_forbidden_for_user(self):
@@ -55,10 +50,6 @@ class TestHotel:
         with pytest.raises(ForbiddenException):
             await self.hotel_service.add_hotel(self.user, add_hotel_request)
 
-    @pytest.mark.asyncio
-    async def test_view_all_hotels_unauthenticated(self):
-        with pytest.raises(UnauthenticatedException):
-            await self.hotel_service.view_all_hotels(None)
 
     @pytest.mark.asyncio
     async def test_get_available_rooms(self):
@@ -77,13 +68,6 @@ class TestHotel:
         assert response[0].room_type == 'regular'
         assert response[0].price == 1000
 
-    @pytest.mark.asyncio
-    async def test_get_available_rooms_unauthenticated(self):
-        availability_request = GetAvailabilityRequest(
-            check_in_date=date(2026, 11, 18), check_out_date=date(2026, 11, 19)
-        )
-        with pytest.raises(UnauthenticatedException):
-            await self.hotel_service.get_available_rooms(1, availability_request, None)
 
     @pytest.mark.asyncio
     async def test_get_available_rooms_hotel_not_found(self):

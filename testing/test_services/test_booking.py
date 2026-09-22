@@ -24,29 +24,16 @@ class TestBooking:
             room_id=1, check_in_date=date(2026, 11, 18), check_out_date=date(2026, 11, 19)
         )
         result = Booking(bid=1, uid=2, room_id=2, booking_date=date(2026, 11, 17), check_in_date=date(2026, 11, 18),
-                    check_out_date=date(2026, 11, 19), status='booked')
+                    check_out_date=date(2026, 11, 19), status='booked', price = 1000)
         self.booking_repository.book_room.return_value = result
         self.room_repository.is_room_available.return_value = Room(room_id = 1, room_type = 'regular', price = 1000, hid = 1)
 
         response = await self.booking_service.book_room(booking_request, self.user)
 
-        assert response[0].bid == 1
-        assert response[1] == 1000
+        assert response.bid == 1
+        assert response.price == 1000
 
 
-    @pytest.mark.asyncio
-    async def test_get_bookings_unauthenticated(self):
-        with pytest.raises(UnauthenticatedException):
-            await self.booking_service.get_bookings(None)
-
-
-    @pytest.mark.asyncio
-    async def test_book_room_unauthenticated(self):
-        booking_request = BookRoomRequest(
-            room_id=1, check_in_date=date(2026, 11, 18), check_out_date=date(2026, 11, 19)
-        )
-        with pytest.raises(UnauthenticatedException):
-            await self.booking_service.book_room(booking_request, None)
 
     @pytest.mark.asyncio
     async def test_book_room_forbidden_for_admin(self):
@@ -67,10 +54,6 @@ class TestBooking:
             await self.booking_service.book_room(booking_request, self.user)
 
 
-    @pytest.mark.asyncio
-    async def test_update_booking_status_unauthenticated(self):
-        with pytest.raises(UnauthenticatedException):
-            await self.booking_service.update_booking_status(1, None, 'completed')
 
     @pytest.mark.asyncio
     async def test_update_booking_status_forbidden_for_admin(self):
@@ -159,10 +142,10 @@ class TestBooking:
             room_id=1, check_in_date=date(2026, 11, 21), check_out_date=date(2026, 11, 23)
         )
         result = Booking(bid=1, uid=2, room_id=2, booking_date=date(2026, 11, 17), check_in_date=date(2026, 11, 21),
-                         check_out_date=date(2026, 11, 23), status='booked')
+                         check_out_date=date(2026, 11, 23), status='booked', price = 1800)
         self.booking_repository.book_room.return_value = result
         self.room_repository.is_room_available.return_value = Room(room_id=1, room_type='regular', price=1000, hid=1)
 
         response = await self.booking_service.book_room(booking_request, self.user)
 
-        assert response[1] == 1800
+        assert response.price == 1800

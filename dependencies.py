@@ -3,7 +3,6 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from config import settings
 from database.database import get_db
 from exceptions.exceptions import UnauthenticatedException
@@ -18,7 +17,7 @@ from services.room_service import RoomService
 
 db_dependency = Annotated[AsyncSession, Depends(get_db)]
 
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login', auto_error=False)
 
 def get_room_repository(db: db_dependency):
     return RoomRepository(db)
@@ -51,12 +50,14 @@ def get_booking_service(room_repository: RoomRepository = Depends(get_room_repos
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
+        if token is None:
+            raise UnauthenticatedException('Register or Login first')
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         email = payload.get('sub')
         user_id = payload.get('id')
         role = payload.get('role')
         if email is None or user_id is None:
-            raise UnauthenticatedException('Could not validate user')
+            raise UnauthenticatedException('Register or Login first')
         return {'email': email, 'uid': user_id, 'role': role}
     except JWTError:
         raise UnauthenticatedException('Could not validate user')

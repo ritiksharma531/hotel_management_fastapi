@@ -6,7 +6,7 @@ from database.database import engine, Base
 from exceptions.exception_handlers import handle_not_found, handle_forbidden, handle_unauthenticated, \
     handle_conflict_error, handle_validation_error
 from exceptions.exceptions import  NotFoundException, ForbiddenException, UnauthenticatedException, ConflictException
-from routers import auth, hotel, room, booking
+from routers import auth, hotel, booking
 
 
 @asynccontextmanager
@@ -14,6 +14,8 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
+
+    await engine.dispose()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -27,5 +29,4 @@ app.add_exception_handler(RequestValidationError, handle_validation_error)
 
 app.include_router(auth.router)
 app.include_router(hotel.router)
-app.include_router(room.router)
 app.include_router(booking.router)

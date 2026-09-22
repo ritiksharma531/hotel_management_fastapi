@@ -5,7 +5,6 @@ from datetime import date
 class AddRoomRequest(BaseModel):
     room_type: str
     price: int = Field(gt=0, lt=50000)
-    hid: int = Field(gt=0)
 
     @field_validator('room_type')
     @classmethod
@@ -37,23 +36,6 @@ class AddRoomResponse(BaseModel):
     hid: int
 
     model_config = {"from_attributes": True}
-
-class BaseBookingResponse(BaseModel):
-    bid: int
-    uid: int
-    room_id: int
-    booking_date: date
-    check_in_date: date
-    check_out_date: date
-    status: str
-
-    model_config = {"from_attributes": True}
-
-class BookRoomResponse(BaseBookingResponse):
-    price: int
-
-class UpdateStatusResponse(BaseBookingResponse):
-    pass
 
 
 class RoomResponse(BaseModel):

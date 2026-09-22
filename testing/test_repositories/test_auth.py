@@ -51,7 +51,7 @@ class TestAuthRepository:
         result.scalar_one_or_none.return_value = user
         self.db.execute.return_value = result
 
-        response = await self.repo.authenticate_user("ritik@gmail.com", "dfdg43Sf!")
+        response = await self.repo.authenticate_user("ritik@gmail.com")
 
         assert response == user
         self.db.execute.assert_awaited_once()
@@ -64,5 +64,4 @@ class TestAuthRepository:
 
         self.db.add.assert_called_once_with(user)
         self.db.commit.assert_awaited_once()
-        self.db.refresh.assert_awaited_once_with(user)
         assert response == user

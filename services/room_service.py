@@ -14,20 +14,19 @@ class RoomService:
     async def is_hotel_available(self, hid: int):
         return await self.hotel_repository.is_hotel_available(hid)
 
-    async def add_room(self, new_room: AddRoomRequest, user: dict):
-        if user is None:
-            raise UnauthenticatedException('Register or Login first')
-
+    async def add_room(self, hid: int, new_room: AddRoomRequest, user: dict):
         if user.get('role') != 'admin':
+            logger.error(f'User with id {user.get('uid')} tried to add room')
             raise ForbiddenException('Only admin allowed')
 
-        if not await self.is_hotel_available(new_room.hid):
+        if not await self.is_hotel_available(hid):
+            logger.error('admin tried to add room but hotel not found')
             raise NotFoundException('Hotel not found')
 
         new_room_model = Room(
             room_type = new_room.room_type,
             price = new_room.price,
-            hid = new_room.hid
+            hid = hid
         )
 
         result = await self.room_repository.add_room(new_room_model)

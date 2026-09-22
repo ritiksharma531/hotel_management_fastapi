@@ -9,9 +9,8 @@ class HotelService:
         self.hotel_repository = hotel_repository
 
     async def add_hotel(self, user: dict, add_hotel_request: AddHotelRequest):
-        if user is None:
-            raise UnauthenticatedException('Register or Login first')
         if user.get('role') != 'admin':
+            logger.error('user tried to add hotel')
             raise ForbiddenException('Only admin can add hotels')
 
         hotel_model = Hotel(
@@ -24,16 +23,13 @@ class HotelService:
 
 
     async def view_all_hotels(self, user: dict):
-        if user is None:
-            raise UnauthenticatedException('Register or Login first')
         result = await self.hotel_repository.get_hotels()
         logger.info(f'User with id {user.get('uid')} viewed all hotels')
         return result
 
     async def get_available_rooms(self, hid, request: GetAvailabilityRequest, user:dict):
-        if user is None:
-            raise UnauthenticatedException('Register or Login first')
         if not await self.hotel_repository.is_hotel_available(hid):
+            logger.error(f'User with id {user.get('uid')} tried to view rooms but hotel not found')
             raise NotFoundException('Hotel not found')
 
         rooms = await self.hotel_repository.get_available_rooms(hid, request.check_in_date, request.check_out_date)

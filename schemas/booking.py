@@ -13,8 +13,12 @@ class BookingResponse(BaseModel):
     check_in_date: date
     check_out_date: date
     status: str
+    price: int
 
     model_config = {"from_attributes": True}
+
+class UpdateStatusResponse(BookingResponse):
+    pass
 
 class BookingStatus(BaseModel):
     status: Literal['checked_in', 'completed', 'cancelled']

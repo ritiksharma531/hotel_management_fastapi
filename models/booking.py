@@ -12,3 +12,4 @@ class Booking(Base):
     check_in_date = Column(DateTime)
     check_out_date = Column(DateTime)
     status = Column(Enum("booked", "checked_in", "cancelled", "completed", name="booking_type_enum"))
+    price = Column(Integer)

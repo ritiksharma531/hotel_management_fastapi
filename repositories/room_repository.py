@@ -13,7 +13,6 @@ class RoomRepository:
     async def add_room(self, room: Room):
         self.db.add(room)
         await self.db.commit()
-        await self.db.refresh(room)
         return room
 
     async def is_room_available(self, room: BookRoomRequest):

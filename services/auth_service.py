@@ -22,7 +22,7 @@ class AuthService:
         return self.password_hash.verify(entered_password, hashed_password)
 
     async def authenticate_user(self, email: str, password: str):
-        cur_user = await self.auth_repository.authenticate_user(email, password)
+        cur_user = await self.auth_repository.authenticate_user(email)
 
         if not cur_user:
             return False
@@ -39,9 +39,11 @@ class AuthService:
 
     async def register_user(self, new_user: RegisterUserRequest):
         if new_user.role == 'admin' and await self.auth_repository.check_admin():
+            logger.error(f'Someone tried to register as admin')
             raise ConflictException("Can't register as admin")
 
         if await self.auth_repository.is_user_exists(new_user.email):
+            logger.error(f'Already registered user tries to register again')
             raise ConflictException('User already exists')
 
         new_user_model = User(
@@ -58,6 +60,7 @@ class AuthService:
     async def login_user(self, form_data:OAuth2PasswordRequestForm):
         cur_user = await self.authenticate_user(form_data.username, form_data.password)
         if not cur_user:
+            logger.error(f'User not authenticated')
             raise UnauthenticatedException('Wrong credentials')
         token = await self.create_token(cur_user.email, cur_user.uid, cur_user.role, timedelta(minutes=20))
         return {'access_token': token, 'token_type': 'bearer'}

@@ -8,7 +8,7 @@ class AuthRepository:
         result = await self.db.execute(select(User).where(User.role == 'admin'))
         return result.scalar_one_or_none()
 
-    async def is_user_exists(self, email):
+    async def is_user_exists(self, email: str):
         result = await self.db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
         if user:
@@ -16,7 +16,7 @@ class AuthRepository:
         return False
 
 
-    async def authenticate_user(self, email: str, password: str):
+    async def authenticate_user(self, email: str):
         result = await self.db.execute(select(User).where(User.email == email))
         cur_user = result.scalar_one_or_none()
         return cur_user
@@ -24,5 +24,4 @@ class AuthRepository:
     async def register(self, new_user_model: User):
         self.db.add(new_user_model)
         await self.db.commit()
-        await self.db.refresh(new_user_model)
         return new_user_model

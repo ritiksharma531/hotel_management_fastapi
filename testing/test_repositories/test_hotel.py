@@ -31,7 +31,6 @@ class TestHotelRepository:
 
         self.db.add.assert_called_once_with(hotel)
         self.db.commit.assert_awaited_once()
-        self.db.refresh.assert_awaited_once_with(hotel)
         assert response == hotel
 
     @pytest.mark.asyncio

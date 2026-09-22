@@ -20,7 +20,6 @@ class HotelRepository:
     async def add_hotel(self, hotel: Hotel):
         self.db.add(hotel)
         await self.db.commit()
-        await self.db.refresh(hotel)
         return hotel
 
 

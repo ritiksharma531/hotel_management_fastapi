@@ -4,7 +4,7 @@ from dependencies import get_hotel_service, get_current_user, get_room_service
 from logs.logger import logger
 from schemas.api_response import APIResponse
 from schemas.hotel import AddHotelRequest, HotelResponse, GetAvailabilityRequest
-from schemas.room import RoomResponse
+from schemas.room import RoomResponse, AddRoomRequest, AddRoomResponse
 from services.hotel_service import HotelService
 
 router = APIRouter(
@@ -33,6 +33,16 @@ async def view_all_hotels(user: dict = Depends(get_current_user), hotel_service:
         success=True,
         message='Hotels fetched successfully',
         data=data
+    )
+
+@router.post('/{hid}/rooms', status_code=status.HTTP_201_CREATED, response_model=APIResponse)
+async def add_room(hid, new_room: AddRoomRequest, user: dict = Depends(get_current_user), room_service: RoomService = Depends(get_room_service)):
+    logger.info(f'add room endpoint hit by {user.get('uid')}')
+    result = await room_service.add_room(hid, new_room, user)
+    return APIResponse(
+        success=True,
+        message='Room Added Successfully',
+        data=AddRoomResponse.model_validate(result).model_dump()
     )
 
 @router.get('/{hid}/rooms', status_code=status.HTTP_200_OK, response_model=APIResponse)

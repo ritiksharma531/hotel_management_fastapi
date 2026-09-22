@@ -19,7 +19,6 @@ class TestRoomRepository:
 
         self.db.add.assert_called_once_with(room)
         self.db.commit.assert_awaited_once()
-        self.db.refresh.assert_awaited_once_with(room)
         assert response == room
 
     @pytest.mark.asyncio
